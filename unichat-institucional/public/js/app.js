@@ -13,6 +13,8 @@ const PAGE_SIZE = 20;
 const MAX_FILE_SIZE = 1.5 * 1024 * 1024;
 // Cambiar a "/assets/notification.mp3" cuando se agregue ese archivo opcional.
 const NOTIFICATION_AUDIO_URL = null;
+const DOGE_IMAGE_URL = "/assets/doge.png";
+const DOGE_ROOM = "General";
 const socket = io();
 
 const state = {
@@ -23,7 +25,16 @@ const state = {
   typingTimer: null,
   remoteTypingTimers: new Map(),
   remoteTypingUsers: new Set(),
-  joinedSocketId: null
+  joinedSocketId: null,
+  doge: {
+    element: null,
+    rafId: null,
+    lastTime: 0,
+    x: 34,
+    y: 28,
+    velocityX: 95,
+    velocityY: 76
+  }
 };
 
 const elements = {
@@ -37,6 +48,7 @@ const elements = {
   activeRoomIcon: document.querySelector("#activeRoomIcon"),
   profileName: document.querySelector("#profileName"),
   profileAvatar: document.querySelector("#profileAvatar"),
+  messagesColumn: document.querySelector(".messages-column"),
   messages: document.querySelector("#messages"),
   messageForm: document.querySelector("#messageForm"),
   messageInput: document.querySelector("#messageInput"),
@@ -134,6 +146,112 @@ function playFallbackTone() {
     oscillator.addEventListener("ended", () => context.close());
   } catch {
     // El navegador puede bloquear audio sin interacción previa.
+  }
+}
+
+function ensureDogeElement() {
+  if (state.doge.element) return state.doge.element;
+
+  const doge = document.createElement("img");
+  doge.className = "doge-screensaver";
+  doge.src = DOGE_IMAGE_URL;
+  doge.alt = "";
+  doge.setAttribute("aria-hidden", "true");
+  doge.decoding = "async";
+  doge.loading = "eager";
+  elements.messagesColumn.append(doge);
+  state.doge.element = doge;
+  return doge;
+}
+
+function isDogeVisible() {
+  return !elements.chatView.hidden && state.room === DOGE_ROOM;
+}
+
+function dogeBounds() {
+  const doge = ensureDogeElement();
+  const messagesRect = elements.messages.getBoundingClientRect();
+  const columnRect = elements.messagesColumn.getBoundingClientRect();
+  const dogeWidth = doge.offsetWidth || 120;
+  const dogeHeight = doge.offsetHeight || 120;
+  const maxX = Math.max(0, messagesRect.width - dogeWidth);
+  const maxY = Math.max(0, messagesRect.height - dogeHeight);
+
+  return {
+    offsetX: messagesRect.left - columnRect.left,
+    offsetY: messagesRect.top - columnRect.top,
+    maxX,
+    maxY
+  };
+}
+
+function positionDoge() {
+  const doge = ensureDogeElement();
+  const bounds = dogeBounds();
+  state.doge.x = Math.min(Math.max(0, state.doge.x), bounds.maxX);
+  state.doge.y = Math.min(Math.max(0, state.doge.y), bounds.maxY);
+  doge.style.transform = `translate3d(${bounds.offsetX + state.doge.x}px, ${bounds.offsetY + state.doge.y}px, 0)`;
+}
+
+function animateDoge(timestamp = 0) {
+  if (!isDogeVisible()) {
+    stopDogeAnimation();
+    return;
+  }
+
+  const doge = ensureDogeElement();
+  doge.classList.add("visible");
+
+  const bounds = dogeBounds();
+  const previousTime = state.doge.lastTime || timestamp;
+  const delta = Math.min((timestamp - previousTime) / 1000, 0.034);
+  state.doge.lastTime = timestamp;
+
+  state.doge.x += state.doge.velocityX * delta;
+  state.doge.y += state.doge.velocityY * delta;
+
+  if (state.doge.x <= 0 || state.doge.x >= bounds.maxX) {
+    state.doge.x = Math.min(Math.max(state.doge.x, 0), bounds.maxX);
+    state.doge.velocityX *= -1;
+  }
+
+  if (state.doge.y <= 0 || state.doge.y >= bounds.maxY) {
+    state.doge.y = Math.min(Math.max(state.doge.y, 0), bounds.maxY);
+    state.doge.velocityY *= -1;
+  }
+
+  doge.style.transform = `translate3d(${bounds.offsetX + state.doge.x}px, ${bounds.offsetY + state.doge.y}px, 0)`;
+  state.doge.rafId = requestAnimationFrame(animateDoge);
+}
+
+function startDogeAnimation() {
+  if (!isDogeVisible()) {
+    stopDogeAnimation();
+    return;
+  }
+
+  ensureDogeElement().classList.add("visible");
+  positionDoge();
+  if (!state.doge.rafId) {
+    state.doge.lastTime = 0;
+    state.doge.rafId = requestAnimationFrame(animateDoge);
+  }
+}
+
+function stopDogeAnimation() {
+  if (state.doge.rafId) {
+    cancelAnimationFrame(state.doge.rafId);
+    state.doge.rafId = null;
+  }
+  state.doge.lastTime = 0;
+  if (state.doge.element) state.doge.element.classList.remove("visible");
+}
+
+function updateDogeBackground() {
+  if (isDogeVisible()) {
+    startDogeAnimation();
+  } else {
+    stopDogeAnimation();
   }
 }
 
@@ -344,6 +462,7 @@ function updateActiveRoom(roomName) {
   clearRemoteTyping();
   renderRooms();
   renderMessages();
+  updateDogeBackground();
   closePanels();
 }
 
