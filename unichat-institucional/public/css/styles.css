@@ -70,6 +70,7 @@ svg {
   width: 38rem;
   height: 38rem;
   background: radial-gradient(circle, rgba(68, 176, 238, 0.28), transparent 68%);
+  animation: ambientMoveone 10s ease-in-out infinite alternate;
 }
 
 .ambient-two {
@@ -78,6 +79,7 @@ svg {
   width: 42rem;
   height: 42rem;
   background: radial-gradient(circle, rgba(18, 53, 95, 0.13), transparent 66%);
+  animation: ambientMovetwo 12s ease-in-out infinite alternate;
 }
 
 .login-view {
@@ -87,7 +89,9 @@ svg {
   padding: 30px 18px;
   background:
     linear-gradient(120deg, rgba(255, 255, 255, 0.83), rgba(241, 249, 255, 0.88)),
-    repeating-linear-gradient(45deg, transparent 0 36px, rgba(26, 94, 150, 0.03) 36px 37px);
+    linear-gradient(135deg,#eaf6ff, #2da4ff, #d8d7ff, #f5fbff, #efb9ff, #d65bff, #d7ffe8, #a0ffbf, #2af95e);
+    background-size: 100% 100% 400% 400%;
+  animation: fondoInstitucional 15s ease infinite;
 }
 
 .login-card {
@@ -1052,4 +1056,35 @@ emoji-picker:not(:defined) + .emoji-fallback {
   .file-card {
     min-width: 0;
   }
+  @keyframes fondoInstitucional {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+  @keyframes ambientMoveone {
+    0% {
+      transform: translate(0, 0) scale(1);
+    }
+    50% {
+      transform: translate(-40, 35px) scale(1);
+    }
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+  } 
+  @keyframes ambientMovetwo {
+    from {
+      transform: translate(0, 0) scale(1);
+    }
+    to {
+      transform: translate(45px, -30px) scale(1);
+    }
+    
+  } 
 }
