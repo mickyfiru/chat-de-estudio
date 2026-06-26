@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Chat académico institucional en tiempo real para estudiantes."
+    />
+    <title>UniChat Institucional</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"
+    />
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <main id="loginView" class="login-view">
+      <section class="login-card">
+        <div class="brand-mark" aria-hidden="true">
+          <span>U</span>
+        </div>
+        <p class="eyebrow">Campus digital</p>
+        <h1>UniChat <span>Institucional</span></h1>
+        <p class="login-subtitle">
+          Chat académico en tiempo real para estudiantes
+        </p>
+
+        <form id="loginForm" novalidate>
+          <label for="username">Nombre de usuario</label>
+          <div class="input-shell">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" />
+            </svg>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              minlength="3"
+              maxlength="30"
+              placeholder="Ej. Camila Rojas"
+              autocomplete="name"
+            />
+          </div>
+
+          <label for="initialRoom">Sala inicial</label>
+          <div class="input-shell">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z" />
+            </svg>
+            <select id="initialRoom" name="initialRoom"></select>
+          </div>
+
+          <button class="primary-button" type="submit">
+            Entrar al chat
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
+        </form>
+
+        <div class="login-note">
+          <span class="status-dot"></span>
+          Comunicación segura dentro de tu comunidad universitaria
+        </div>
+      </section>
+    </main>
+
+    <main id="chatView" class="chat-view" hidden>
+      <aside id="sidebar" class="sidebar">
+        <div class="sidebar-brand">
+          <div class="mini-mark">U</div>
+          <div>
+            <strong>UniChat</strong>
+            <span>Institucional</span>
+          </div>
+          <button id="closeSidebar" class="icon-button mobile-only" aria-label="Cerrar menú">×</button>
+        </div>
+
+        <nav aria-label="Salas temáticas">
+          <p class="nav-label">Salas académicas</p>
+          <div id="roomList" class="room-list"></div>
+        </nav>
+
+        <div class="profile-card">
+          <div id="profileAvatar" class="avatar"></div>
+          <div>
+            <strong id="profileName"></strong>
+            <span><i></i> En línea</span>
+          </div>
+          <button id="logoutButton" class="logout-button" title="Cerrar sesión" aria-label="Cerrar sesión">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M10 17l5-5-5-5M15 12H3M14 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5" />
+            </svg>
+          </button>
+        </div>
+      </aside>
+
+      <section class="chat-panel">
+        <header class="chat-header">
+          <button id="openSidebar" class="icon-button mobile-only" aria-label="Abrir menú">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          </button>
+          <div class="room-heading">
+            <div id="activeRoomIcon" class="room-icon"></div>
+            <div>
+              <p>Conversación actual</p>
+              <h2 id="activeRoomTitle">General</h2>
+            </div>
+          </div>
+          <label class="search-box" for="messageSearch">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="m21 21-4.35-4.35M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0Z" />
+            </svg>
+            <input id="messageSearch" type="search" placeholder="Buscar mensajes..." />
+          </label>
+          <button id="toggleUsers" class="users-toggle" aria-label="Ver usuarios conectados">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
+            </svg>
+            <span id="userCount">0</span>
+          </button>
+        </header>
+
+        <div class="conversation-layout">
+          <section class="messages-column">
+            <div id="messages" class="messages" aria-live="polite"></div>
+            <div id="typingIndicator" class="typing-indicator" aria-live="polite"></div>
+
+            <form id="messageForm" class="composer">
+              <div class="emoji-wrap">
+                <button id="emojiButton" class="composer-button" type="button" aria-label="Insertar emoji">☺</button>
+                <div id="emojiPanel" class="emoji-panel" hidden>
+                  <emoji-picker></emoji-picker>
+                  <div class="emoji-fallback" aria-label="Emojis rápidos">
+                    <button type="button">😀</button><button type="button">😂</button>
+                    <button type="button">❤️</button><button type="button">👍</button>
+                    <button type="button">🎓</button><button type="button">📚</button>
+                    <button type="button">💻</button><button type="button">✨</button>
+                  </div>
+                </div>
+              </div>
+              <button id="fileButton" class="composer-button" type="button" aria-label="Adjuntar archivo">
+                <svg aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                </svg>
+              </button>
+              <input id="fileInput" type="file" hidden />
+              <input
+                id="messageInput"
+                type="text"
+                maxlength="800"
+                autocomplete="off"
+                placeholder="Escribe un mensaje para tu sala..."
+              />
+              <button class="send-button" type="submit" aria-label="Enviar mensaje">
+                <span>Enviar</span>
+                <svg aria-hidden="true" viewBox="0 0 24 24">
+                  <path d="m22 2-7 20-4-9-9-4 20-7Z" />
+                </svg>
+              </button>
+            </form>
+          </section>
+
+          <aside id="usersPanel" class="users-panel">
+            <div class="users-heading">
+              <div>
+                <p>En esta sala</p>
+                <h3>Compañeros conectados</h3>
+              </div>
+              <button id="closeUsers" class="icon-button" aria-label="Cerrar usuarios">×</button>
+            </div>
+            <div id="usersList" class="users-list"></div>
+          </aside>
+        </div>
+      </section>
+      <div id="overlay" class="overlay"></div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1/index.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/app.js"></script>
+  </body>
+</html>
